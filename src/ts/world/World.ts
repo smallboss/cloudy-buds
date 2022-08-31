@@ -27,7 +27,6 @@ import { Path } from './Path';
 import { CollisionGroups } from '../enums/CollisionGroups';
 import { BoxCollider } from '../physics/colliders/BoxCollider';
 import { TrimeshCollider } from '../physics/colliders/TrimeshCollider';
-import { Vehicle } from '../vehicles/Vehicle';
 import { Scenario } from './Scenario';
 import { Sky } from './Sky';
 import { Ocean } from './Ocean';
@@ -63,7 +62,7 @@ export class World
 	public cannonDebugRenderer: CannonDebugRenderer;
 	public scenarios: Scenario[] = [];
 	public characters: Character[] = [];
-	public vehicles: Vehicle[] = [];
+	// public vehicles: Vehicle[] = [];
 	public paths: Path[] = [];
 	public scenarioGUIFolder: any;
 	public updatables: IUpdatable[] = [];
@@ -240,15 +239,15 @@ export class World
 			}
 		});
 
-		this.vehicles.forEach((vehicle) => {
-			if (this.isOutOfBounds(vehicle.rayCastVehicle.chassisBody.position))
-			{
-				let worldPos = new THREE.Vector3();
-				vehicle.spawnPoint.getWorldPosition(worldPos);
-				worldPos.y += 1;
-				this.outOfBoundsRespawn(vehicle.rayCastVehicle.chassisBody, Utils.cannonVector(worldPos));
-			}
-		});
+		// this.vehicles.forEach((vehicle) => {
+		// 	if (this.isOutOfBounds(vehicle.rayCastVehicle.chassisBody.position))
+		// 	{
+		// 		let worldPos = new THREE.Vector3();
+		// 		vehicle.spawnPoint.getWorldPosition(worldPos);
+		// 		worldPos.y += 1;
+		// 		this.outOfBoundsRespawn(vehicle.rayCastVehicle.chassisBody, Utils.cannonVector(worldPos));
+		// 	}
+		// });
 	}
 
 	public isOutOfBounds(position: CANNON.Vec3): boolean
@@ -496,10 +495,10 @@ export class World
 			i--;
 		}
 
-		for (let i = 0; i < this.vehicles.length; i++) {
-			this.remove(this.vehicles[i]);
-			i--;
-		}
+		// for (let i = 0; i < this.vehicles.length; i++) {
+		// 	this.remove(this.vehicles[i]);
+		// 	i--;
+		// }
 	}
 
 	public scrollTheTimeScale(scrollAmount: number): void

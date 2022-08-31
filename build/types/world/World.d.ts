@@ -10,6 +10,7 @@ import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { IUpdatable } from '../interfaces/IUpdatable';
 import { Character } from '../characters/Character';
 import { Path } from './Path';
+import { BoxCollider } from '../physics/colliders/BoxCollider';
 import { Vehicle } from '../vehicles/Vehicle';
 import { Scenario } from './Scenario';
 import { Sky } from './Sky';
@@ -43,6 +44,9 @@ export declare class World {
     paths: Path[];
     scenarioGUIFolder: any;
     updatables: IUpdatable[];
+    rotObj: BoxCollider;
+    floor: BoxCollider;
+    wheel: CANNON.HingeConstraint;
     private lastScenarioID;
     constructor(worldScenePath?: any);
     update(timeStep: number, unscaledTimeStep: number): void;

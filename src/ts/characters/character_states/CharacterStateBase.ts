@@ -53,25 +53,25 @@ export abstract class CharacterStateBase implements ICharacterState
 
 	public onInputChange(): void
 	{
-		if (this.canFindVehiclesToEnter && this.character.actions.enter.justPressed)
-		{
-			this.character.findVehicleToEnter(true);
-		}
-		else if (this.canFindVehiclesToEnter && this.character.actions.enter_passenger.justPressed)
-		{
-			this.character.findVehicleToEnter(false);
-		}
-		else if (this.canEnterVehicles && this.character.vehicleEntryInstance !== null)
-		{
-			if (this.character.actions.up.justPressed ||
-				this.character.actions.down.justPressed ||
-				this.character.actions.left.justPressed ||
-				this.character.actions.right.justPressed)
-				{
-					this.character.vehicleEntryInstance = null;
-					this.character.actions.up.isPressed = false;
-				}
-		}
+		// if (this.canFindVehiclesToEnter && this.character.actions.enter.justPressed)
+		// {
+		// 	this.character.findVehicleToEnter(true);
+		// }
+		// else if (this.canFindVehiclesToEnter && this.character.actions.enter_passenger.justPressed)
+		// {
+		// 	this.character.findVehicleToEnter(false);
+		// }
+		// else if (this.canEnterVehicles && this.character.vehicleEntryInstance !== null)
+		// {
+		// 	if (this.character.actions.up.justPressed ||
+		// 		this.character.actions.down.justPressed ||
+		// 		this.character.actions.left.justPressed ||
+		// 		this.character.actions.right.justPressed)
+		// 		{
+		// 			// this.character.vehicleEntryInstance = null;
+		// 			this.character.actions.up.isPressed = false;
+		// 		}
+		// }
 	}
 
 	public noDirection(): boolean
