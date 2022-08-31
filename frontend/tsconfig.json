@@ -1,0 +1,34 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist/",
+        "module": "es6",
+        "target": "es2017",
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true,
+        "declaration": true,
+        "declarationDir": "./src/types",
+        "baseUrl": ".",
+        "paths": {
+            "cannon" : ["./src/lib/cannon/cannon"]
+        }
+    },
+    "include": [
+        "./src/**/*"
+    ],
+    "exclude": [
+      "node_modules"
+    ]
+}
+
+//"outDir": "./dist/",
+//"sourceMap": true,
+//"strict": true,
+//"noImplicitReturns": true,
+//"noImplicitAny": true,
+//"module": "es6",
+////        "module": "es2022",
+//"moduleResolution": "node",
+//"target": "es2017",
+//"allowJs": true,
+//"allowSyntheticDefaultImports": true,
+//"baseUrl": "./src",
