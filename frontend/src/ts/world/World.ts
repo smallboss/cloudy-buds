@@ -226,15 +226,15 @@ export class World
 		// Step the physics world
 		this.physicsWorld.step(this.physicsFrameTime, timeStep);
 
-		// if (this.rotObj?.options?.obj3d) {
-		// 	this.rotObj?.options.obj3d.position.copy(this.rotObj.body.position);
-		// 	this.rotObj?.options.obj3d.quaternion.copy(this.rotObj.body.quaternion);
-		// }
+		if (this.rotObj?.options?.obj3d) {
+			this.rotObj?.options.obj3d.position.copy(this.rotObj.body.position);
+			this.rotObj?.options.obj3d.quaternion.copy(this.rotObj.body.quaternion);
+		}
 
-		// if (this.floor?.options?.obj3d) {
-		// 	this.floor?.options.obj3d.position.copy(this.floor.body.position);
-		// 	this.floor?.options.obj3d.quaternion.copy(this.floor.body.quaternion);
-		// }
+		if (this.floor?.options?.obj3d) {
+			this.floor?.options.obj3d.position.copy(this.floor.body.position);
+			this.floor?.options.obj3d.quaternion.copy(this.floor.body.quaternion);
+		}
 
 		this.characters.forEach((char) => {
 			if (this.isOutOfBounds(char.characterCapsule.body.position))
@@ -354,13 +354,15 @@ export class World
 		gltf.scene.traverse((child) => {
 			if(child.name.match('Hammer')){
 				let hammer = new HammerCollider(child);
+				console.log(child.userData.clockwise)
 				this.physicsWorld.addBody(hammer.bottom);
 				this.physicsWorld.addBody(hammer.body);
 				this.physicsWorld.addConstraint(hammer.hammer);
 				//@ts-ignore
 				hammer.hammer.enableMotor();
 				//@ts-ignore
-				hammer.hammer.setMotorSpeed(1);
+				hammer.hammer.setMotorSpeed(+child.userData.clockwise ? 5 : -5);
+				hammer.hammer.collideConnected = false
 				this.hammers.push(hammer)
 
 
