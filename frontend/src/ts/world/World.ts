@@ -357,11 +357,12 @@ export class World
 				this.physicsWorld.addBody(hammer.bottom);
 				this.physicsWorld.addBody(hammer.body);
 				this.physicsWorld.addConstraint(hammer.hammer);
-				// //@ts-ignore
+				//@ts-ignore
 				hammer.hammer.enableMotor();
-				  //@ts-ignore
+				//@ts-ignore
 				hammer.hammer.setMotorSpeed(1);
 				this.hammers.push(hammer)
+				
 				
 			} else if (child.hasOwnProperty('userData'))
 			{
