@@ -70,9 +70,9 @@ export class World
 	public rotObj: BoxCollider;
 	public floor: BoxCollider;
 	public wheel: CANNON.HingeConstraint;
+	public hammers: HammerCollider[] = []
 
 	private lastScenarioID: string;
-	private dynamicMeshes: []
 
 	constructor(worldScenePath?: any)
 	{
@@ -209,6 +209,10 @@ export class World
 		this.updatables.forEach((entity) => {
 			entity.update(timeStep, unscaledTimeStep);
 		});
+
+		this.hammers.forEach(el => {
+			el.update()
+		})
 
 		// Lerp time scale
 		this.params.Time_Scale = THREE.MathUtils.lerp(this.params.Time_Scale, this.timeScaleTarget, 0.2);
@@ -349,16 +353,15 @@ export class World
 	{
 		gltf.scene.traverse((child) => {
 			if(child.name.match('Hammer')){
-				let phys = new HammerCollider(child)//, this.dynamicMeshes);
-				this.physicsWorld.addBody(phys.body);
-				//this.physicsWorld.addBody(phys.bottom);
-				//this.physicsWorld.addConstraint(phys.hammer);
-				//@ts-ignore
-				//phys.hammer.enableMotor();
-				 //const { clockwise } = child.userData;
-				 //@ts-ignore
-				//phys.hammer.setMotorSpeed(20);
-				
+				let hammer = new HammerCollider(child);
+				this.physicsWorld.addBody(hammer.bottom);
+				this.physicsWorld.addBody(hammer.body);
+				this.physicsWorld.addConstraint(hammer.hammer);
+				// //@ts-ignore
+				hammer.hammer.enableMotor();
+				  //@ts-ignore
+				hammer.hammer.setMotorSpeed(1);
+				this.hammers.push(hammer)
 				
 			} else if (child.hasOwnProperty('userData'))
 			{

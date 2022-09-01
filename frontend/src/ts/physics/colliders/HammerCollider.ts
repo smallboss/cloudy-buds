@@ -1,11 +1,11 @@
 import * as CANNON from 'cannon';
-import { Vector3 } from 'three';
 import { ICollider } from '../../interfaces/ICollider';
 
 export class HammerCollider implements ICollider {
   public body: CANNON.Body;
   public bottom: CANNON.Body;
   public hammer: CANNON.HingeConstraint;
+  public mesh: THREE.Mesh
 
   constructor(mesh) {
     let mat = new CANNON.Material('boxMat');
@@ -13,56 +13,48 @@ export class HammerCollider implements ICollider {
     // // mat.restitution = 0.7;
 
     // // Add phys sphere
-
+    this.mesh = mesh
     const meshPosition = mesh.position.clone();
     meshPosition.y = 0.2;
 
 
-    const hammerBottom = new CANNON.Body({
-      mass: 10,
-      shape: new CANNON.Cylinder(0.8, 0.8, 0.4, 16),
-      quaternion: new CANNON.Quaternion(0.707, 0, 0, 0.707),
+    this.bottom = new CANNON.Body({
+      mass: 0,
+      shape: new CANNON.Box(new CANNON.Vec3(0.8, 0.2, 0.8)),
       position: meshPosition
     });
 
-    const hammer = new CANNON.Body({
+    this.body = new CANNON.Body({
       material: mat,
-      mass: 0
+      mass: 10,
+      quaternion: new CANNON.Quaternion(0.707, 0, 0, 0.707)
     });
 
-    hammer.addShape(new CANNON.Cylinder(
-        0.55, 0.55, 1.01, 16),
-        mesh.position.clone().add(new Vector3(-1.5, 0, 0))
-        );
+    this.body.addShape(
+      new CANNON.Cylinder(0.3, 0.3, 2, 16),
+      );
 
-    hammer.addShape(
+    this.body.addShape(
         new CANNON.Cylinder(0.25, 0.25, 0.7, 16),
-        new CANNON.Vec3(-2.1, 1.4, 0),
+        new CANNON.Vec3(0.6, 0, 0),
         new CANNON.Quaternion(0, 0.707, 0, 0.707)
         );
 
-    hammer.addShape(
-        new CANNON.Cylinder(0.3, 0.3, 2, 16),
-        new CANNON.Vec3(-1.48, 1.4, 0),
-        new CANNON.Quaternion(0.707, 0, 0, 0.707)
+    this.body.addShape(
+      new CANNON.Cylinder(0.55, 0.55, 1.01, 16),
+      new CANNON.Vec3(1.6, 0, 0),
+      new CANNON.Quaternion(0.707, 0,0, 0.707)
         );
-    const q = new CANNON.Quaternion()
-    q.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), Math.PI/2)
 
-    
-    this.body = new CANNON.Body({
-        shape: new CANNON.Cylinder(1, 1, 2, 16),
-        position: new CANNON.Vec3(0, 2, -3),
-        quaternion: q
-    });//hammer
-    //hammer.quaternion = new CANNON.Quaternion(0, 0.707 ,0,0.707)
-    //this.bottom = hammerBottom
-
-    // this.hammer = new CANNON.HingeConstraint(hammerBottom,hammer, {
-    //   pivotA: new CANNON.Vec3(0, 0, 0),
-    //   pivotB: new CANNON.Vec3(0, 0, ),
-    //   axisA: new CANNON.Vec3(1, 1, 0),
-    //   axisB: new CANNON.Vec3(0, 1, 0)
-    // });
+    this.hammer = new CANNON.HingeConstraint(this.bottom ,this.body, {
+      pivotA: new CANNON.Vec3(0, 0.2, 0),
+      pivotB: new CANNON.Vec3(0, 0, 1),
+      axisA: new CANNON.Vec3(0, 1, 0),
+      axisB: new CANNON.Vec3(0, 0, 1)
+    });
+  }
+  update = () => {
+    //@ts-ignore
+    this.mesh.quaternion.set(this.body.quaternion.x, this.body.quaternion.y, this.body.quaternion.z, this.body.quaternion.w)
   }
 }
