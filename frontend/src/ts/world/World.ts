@@ -26,6 +26,7 @@ import { Character } from '../characters/Character';
 import { Path } from './Path';
 import { CollisionGroups } from '../enums/CollisionGroups';
 import { BoxCollider } from '../physics/colliders/BoxCollider';
+import { HammerCollider } from '../physics/colliders/HammerCollider';
 import { TrimeshCollider } from '../physics/colliders/TrimeshCollider';
 import { Scenario } from './Scenario';
 import { Sky } from './Sky';
@@ -71,6 +72,7 @@ export class World
 	public wheel: CANNON.HingeConstraint;
 
 	private lastScenarioID: string;
+	private dynamicMeshes: []
 
 	constructor(worldScenePath?: any)
 	{
@@ -220,15 +222,15 @@ export class World
 		// Step the physics world
 		this.physicsWorld.step(this.physicsFrameTime, timeStep);
 
-		if (this.rotObj?.options?.obj3d) {
-			this.rotObj?.options.obj3d.position.copy(this.rotObj.body.position);
-			this.rotObj?.options.obj3d.quaternion.copy(this.rotObj.body.quaternion);
-		}
+		// if (this.rotObj?.options?.obj3d) {
+		// 	this.rotObj?.options.obj3d.position.copy(this.rotObj.body.position);
+		// 	this.rotObj?.options.obj3d.quaternion.copy(this.rotObj.body.quaternion);
+		// }
 
-		if (this.floor?.options?.obj3d) {
-			this.floor?.options.obj3d.position.copy(this.floor.body.position);
-			this.floor?.options.obj3d.quaternion.copy(this.floor.body.quaternion);
-		}
+		// if (this.floor?.options?.obj3d) {
+		// 	this.floor?.options.obj3d.position.copy(this.floor.body.position);
+		// 	this.floor?.options.obj3d.quaternion.copy(this.floor.body.quaternion);
+		// }
 
 		this.characters.forEach((char) => {
 			if (this.isOutOfBounds(char.characterCapsule.body.position))
@@ -346,7 +348,19 @@ export class World
 	public loadScene(loadingManager: LoadingManager, gltf: any): void
 	{
 		gltf.scene.traverse((child) => {
-			if (child.hasOwnProperty('userData'))
+			if(child.name.match('Hammer')){
+				let phys = new HammerCollider(child)//, this.dynamicMeshes);
+				this.physicsWorld.addBody(phys.body);
+				//this.physicsWorld.addBody(phys.bottom);
+				//this.physicsWorld.addConstraint(phys.hammer);
+				//@ts-ignore
+				//phys.hammer.enableMotor();
+				 //const { clockwise } = child.userData;
+				 //@ts-ignore
+				//phys.hammer.setMotorSpeed(20);
+				
+				
+			} else if (child.hasOwnProperty('userData'))
 			{
 				if (child.type === 'Mesh')
 				{
@@ -380,9 +394,9 @@ export class World
 								phys.body.quaternion.copy(Utils.cannonQuat(child.quaternion));
 								phys.body.computeAABB();
 
-								phys.body.shapes.forEach((shape) => {
-									shape.collisionFilterMask = ~CollisionGroups.TrimeshColliders;
-								});
+								// phys.body.shapes.forEach((shape) => {
+								// 	shape.collisionFilterMask = ~CollisionGroups.TrimeshColliders;
+								// });
 
 								if (child.name === 'Cube001') {
 									this.rotObj = phys;
@@ -397,6 +411,7 @@ export class World
 									const box3A = new THREE.Box3().setFromObject(this.floor.options.obj3d);
 									const box3B = new THREE.Box3().setFromObject(this.rotObj.options.obj3d);
 									// const motor = new CANNON.RigidVehicle({chassisBody: phys.body});
+									console.log(this.floor.body, this.rotObj.body,)
 									this.wheel = new CANNON.HingeConstraint(
 										this.floor.body, this.rotObj.body,
 										{
@@ -412,12 +427,8 @@ export class World
 									this.wheel.enableMotor();
 									// @ts-ignore
 									this.wheel.setMotorSpeed(2);
-
-									console.log('this.wheel', this.wheel);
-
-									// @ts-ignore
-									console.log('phys', this.rotObj, phys.body, child);
 								}
+								console.log(phys)
 
 								this.physicsWorld.addBody(phys.body);
 							}
@@ -445,6 +456,7 @@ export class World
 		});
 
 		this.graphicsWorld.add(gltf.scene);
+		this.graphicsWorld.add(new THREE.AxesHelper(3))
 
 		// Launch default scenario
 		let defaultScenarioID: string;
