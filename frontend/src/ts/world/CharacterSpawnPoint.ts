@@ -12,10 +12,12 @@ import {FBXLoader} from "three/examples/jsm/loaders/FBXLoader";
 export class CharacterSpawnPoint implements ISpawnPoint
 {
 	private object: THREE.Object3D;
+	public isPlayer: boolean = false;
 
-	constructor(object: THREE.Object3D)
+	constructor(object: THREE.Object3D, isPlayer: boolean = false)
 	{
 		this.object = object;
+		this.isPlayer = isPlayer;
 	}
 
 	public spawn(loadingManager: LoadingManager, world: World): void
@@ -33,13 +35,16 @@ export class CharacterSpawnPoint implements ISpawnPoint
 
 			let worldPos = new THREE.Vector3();
 			this.object.getWorldPosition(worldPos);
+			if (!this.isPlayer) {
+				worldPos.copy(worldPos.clone().add(new THREE.Vector3(1, 1, 1)));
+			}
 			player.setPosition(worldPos.x, worldPos.y, worldPos.z);
 
 			let forward = Utils.getForward(this.object);
 			player.setOrientation(forward, true);
 
 			world.add(player);
-			player.takeControl();
+			if (this.isPlayer) player.takeControl();
 		});
 	}
 }

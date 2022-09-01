@@ -64,8 +64,11 @@ export class Scenario
 				{
 					if (child.userData.type === 'player')
 					{
-						let sp = new CharacterSpawnPoint(child);
+						let sp = new CharacterSpawnPoint(child, true);
 						this.spawnPoints.push(sp);
+
+						let sp1 = new CharacterSpawnPoint(child);
+						this.spawnPoints.push(sp1);
 					}
 				}
 			}

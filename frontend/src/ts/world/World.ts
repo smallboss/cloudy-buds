@@ -362,8 +362,8 @@ export class World
 				//@ts-ignore
 				hammer.hammer.setMotorSpeed(1);
 				this.hammers.push(hammer)
-				
-				
+
+
 			} else if (child.hasOwnProperty('userData'))
 			{
 				if (child.type === 'Mesh')
@@ -427,7 +427,7 @@ export class World
 									);
 									// console.log('motor', motor);
 									// setTimeout(() => )
-									this.physicsWorld.addConstraint(this.wheel);
+									// this.physicsWorld.addConstraint(this.wheel);
 									this.wheel.enableMotor();
 									// @ts-ignore
 									this.wheel.setMotorSpeed(2);

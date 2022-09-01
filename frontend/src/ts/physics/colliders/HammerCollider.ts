@@ -27,11 +27,13 @@ export class HammerCollider implements ICollider {
     this.body = new CANNON.Body({
       material: mat,
       mass: 1,
+      shape: new CANNON.Cylinder(0.3, 0.3, 2, 16),
+      position: new CANNON.Vec3(0.8, 1, 0.8)
     });
 
-    this.body.addShape(
-      new CANNON.Cylinder(0.3, 0.3, 2, 16),
-      );
+    // this.body.addShape(
+    //   new CANNON.Cylinder(0.3, 0.3, 2, 16),
+    // );
 
     this.body.addShape(
         new CANNON.Cylinder(0.25, 0.25, 0.7, 16),
@@ -75,7 +77,7 @@ export class HammerCollider implements ICollider {
 // this.body = new CANNON.Body({
 //   material: mat,
 //   mass: 10,
-  
+
 // });
 
 // this.body.addShape(
