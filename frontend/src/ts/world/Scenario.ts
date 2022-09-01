@@ -67,8 +67,9 @@ export class Scenario
 						let sp = new CharacterSpawnPoint(child, true);
 						this.spawnPoints.push(sp);
 
-						let sp1 = new CharacterSpawnPoint(child);
-						this.spawnPoints.push(sp1);
+						[...new Array(3)].forEach(el => {
+							this.spawnPoints.push(new CharacterSpawnPoint(child));
+						});
 					}
 				}
 			}

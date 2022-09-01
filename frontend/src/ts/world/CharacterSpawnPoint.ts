@@ -9,6 +9,8 @@ import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {FBXLoader} from "three/examples/jsm/loaders/FBXLoader";
 // import path from '../../assets/models/boxman_.glb';
 
+const randomBetween = (min, max) => Math.floor(Math.random() * (max - min)) + min;
+
 export class CharacterSpawnPoint implements ISpawnPoint
 {
 	private object: THREE.Object3D;
@@ -36,7 +38,7 @@ export class CharacterSpawnPoint implements ISpawnPoint
 			let worldPos = new THREE.Vector3();
 			this.object.getWorldPosition(worldPos);
 			if (!this.isPlayer) {
-				worldPos.copy(worldPos.clone().add(new THREE.Vector3(1, 1, 1)));
+				worldPos.copy(worldPos.clone().add(new THREE.Vector3(randomBetween(-5, 5), randomBetween(-5, 5), randomBetween(-5, 5))));
 			}
 			player.setPosition(worldPos.x, worldPos.y, worldPos.z);
 

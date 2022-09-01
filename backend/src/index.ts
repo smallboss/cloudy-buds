@@ -19,17 +19,17 @@ class Server {
     const serverHttp = http.createServer(this.app);
     io.attach(serverHttp);
 
-    db()
-      .then((info: any) => {
-        console.log(`Connected ${info.name} database`);
+    // db()
+    //   .then((info: any) => {
+    //     console.log(`Connected ${info.name} database`);
         serverHttp.listen(config.APP_PORT || 3001, () => {
-          console.log('Launched The Neighbour Meta server');
+          console.log('Launched SkyBuds server');
         });
-      })
-      .catch((err) => {
-        console.error(`Error ${err.message}`);
-        process.exit(1);
-      });
+    //   })
+    //   .catch((err) => {
+    //     console.error(`Error ${err.message}`);
+    //     process.exit(1);
+    //   });
 
     this.app.use('/api', this.router);
 
