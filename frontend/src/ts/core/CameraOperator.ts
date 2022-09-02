@@ -82,7 +82,7 @@ export class CameraOperator implements IInputReceiver, IUpdatable
 		this.theta -= deltaX * (this.sensitivity.x / 2);
 		this.theta %= 360;
 		this.phi += deltaY * (this.sensitivity.y / 2);
-		this.phi = Math.min(85, Math.max(-85, this.phi));
+		this.phi = Math.min(85, Math.max(-5, this.phi));
 	}
 
 	public update(timeScale: number): void
