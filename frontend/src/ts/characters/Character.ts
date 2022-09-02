@@ -20,6 +20,7 @@ import { GroundImpactData } from './GroundImpactData';
 import { ClosestObjectFinder } from '../core/ClosestObjectFinder';
 import { Object3D } from 'three';
 import { EntityType } from '../enums/EntityType';
+import { DropRolling } from './character_states/DropRolling';
 
 export class Character extends THREE.Object3D implements IWorldEntity
 {
@@ -154,6 +155,15 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 		// States
 		this.setState(new Idle(this));
+		this.colliding()
+	}
+
+	public colliding = () => {
+		this.characterCapsule.body.addEventListener('collide', e => {
+			if(e.contact.bj.material.name === 'HammerMat'){
+				this.setState(new DropRolling(this));
+			}
+		})
 	}
 
 	public setAnimations(animations: []): void
