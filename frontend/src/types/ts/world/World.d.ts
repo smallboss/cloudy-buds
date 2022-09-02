@@ -11,6 +11,7 @@ import { IUpdatable } from '../interfaces/IUpdatable';
 import { Character } from '../characters/Character';
 import { Path } from './Path';
 import { BoxCollider } from '../physics/colliders/BoxCollider';
+import { HammerCollider } from '../physics/colliders/HammerCollider';
 import { Scenario } from './Scenario';
 import { Sky } from './Sky';
 export declare class World {
@@ -45,6 +46,7 @@ export declare class World {
     rotObj: BoxCollider;
     floor: BoxCollider;
     wheel: CANNON.HingeConstraint;
+    hammers: HammerCollider[];
     private lastScenarioID;
     constructor(worldScenePath?: any);
     update(timeStep: number, unscaledTimeStep: number): void;

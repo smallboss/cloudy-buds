@@ -21,14 +21,14 @@ export class InputManager implements IUpdatable
 	public boundOnPointerlockError: (evt: any) => void;
 	public boundOnKeyDown: (evt: any) => void;
 	public boundOnKeyUp: (evt: any) => void;
-	
+
 	constructor(world: World, domElement: HTMLElement)
 	{
 		this.world = world;
 		this.pointerLock = world.params.Pointer_Lock;
 		this.domElement = domElement || document.body;
 		this.isLocked = false;
-		
+
 		// Bindings for later event use
 		// Mouse
 		this.boundOnMouseDown = (evt) => this.onMouseDown(evt);
@@ -47,10 +47,10 @@ export class InputManager implements IUpdatable
 		// Init event listeners
 		// Mouse
 		this.domElement.addEventListener('mousedown', this.boundOnMouseDown, false);
-		document.addEventListener('wheel', this.boundOnMouseWheelMove, false);
+		// document.addEventListener('wheel', this.boundOnMouseWheelMove, false);
 		document.addEventListener('pointerlockchange', this.boundOnPointerlockChange, false);
 		document.addEventListener('pointerlockerror', this.boundOnPointerlockError, false);
-		
+
 		// Keys
 		document.addEventListener('keydown', this.boundOnKeyDown, false);
 		document.addEventListener('keyup', this.boundOnKeyUp, false);

@@ -7,6 +7,8 @@ import * as Utils from '../core/FunctionLibrary';
 import {Object3D} from "three";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {FBXLoader} from "three/examples/jsm/loaders/FBXLoader";
+import {Walk} from "../characters/character_states/Walk";
+import {StartWalkLeft} from "../characters/character_states/StartWalkLeft";
 // import path from '../../assets/models/boxman_.glb';
 
 const randomBetween = (min, max) => Math.floor(Math.random() * (max - min)) + min;
@@ -15,6 +17,7 @@ export class CharacterSpawnPoint implements ISpawnPoint
 {
 	private object: THREE.Object3D;
 	public isPlayer: boolean = false;
+	public character: Character;
 
 	constructor(object: THREE.Object3D, isPlayer: boolean = false)
 	{
@@ -34,6 +37,7 @@ export class CharacterSpawnPoint implements ISpawnPoint
 
 
 			let player = new Character(model);
+			this.character = player;
 
 			let worldPos = new THREE.Vector3();
 			this.object.getWorldPosition(worldPos);
@@ -48,6 +52,11 @@ export class CharacterSpawnPoint implements ISpawnPoint
 			world.add(player);
 			if (this.isPlayer) player.takeControl();
 		});
+	}
+
+	walk(): void {
+		this.character.setState(new StartWalkLeft(this.character));
+		this.character.triggerAction('up', true);
 	}
 }
 
