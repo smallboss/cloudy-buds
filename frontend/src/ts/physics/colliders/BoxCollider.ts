@@ -25,20 +25,21 @@ export class BoxCollider implements ICollider
 
 		let mat = new CANNON.Material('boxMat');
 		mat.friction = options.friction;
-		// mat.restitution = 0.7;
 
 		let shape = new CANNON.Box(options.size);
-		// shape.material = mat;
 
 		// Add phys sphere
 		let physBox = new CANNON.Body({
 			mass: options.mass,
 			position: options.position,
-			shape
+			shape,
+			material: mat
 		});
-		
-		physBox.material = mat;
 
 		this.body = physBox;
+	}
+	update = () => {
+			this.options.child.position.copy(Utils.threeVector(this.body.position));
+			this.options.child.quaternion.copy(Utils.threeQuat(this.body.quaternion));
 	}
 }

@@ -71,6 +71,7 @@ export class World
 	public wheel: CANNON.HingeConstraint;
 	public hammers: HammerCollider[] = []
 	public kettlebells: KettlebellCollider[] = []
+	public boxes: BoxCollider[] = []
 
 	private lastScenarioID: string;
 
@@ -210,10 +211,6 @@ export class World
 			entity.update(timeStep, unscaledTimeStep);
 		});
 
-		this.hammers.forEach(el => {
-			el.update()
-		})
-
 		// Lerp time scale
 		this.params.Time_Scale = THREE.MathUtils.lerp(this.params.Time_Scale, this.timeScaleTarget, 0.2);
 
@@ -226,22 +223,24 @@ export class World
 		// Step the physics world
 		this.physicsWorld.step(this.physicsFrameTime, timeStep);
 
-		if (this.rotObj?.options?.obj3d) {
-			this.rotObj?.options.obj3d.position.copy(this.rotObj.body.position);
-			this.rotObj?.options.obj3d.quaternion.copy(this.rotObj.body.quaternion);
-		}
-
-		if (this.floor?.options?.obj3d) {
-			this.floor?.options.obj3d.position.copy(this.floor.body.position);
-			this.floor?.options.obj3d.quaternion.copy(this.floor.body.quaternion);
-		}
-
 		this.characters.forEach((char) => {
 			if (this.isOutOfBounds(char.characterCapsule.body.position))
 			{
 				this.outOfBoundsRespawn(char.characterCapsule.body);
 			}
 		});
+
+		this.hammers.forEach(el => {
+			el.update()
+		})
+
+		this.kettlebells.forEach(el => {
+			el.update()
+		})
+
+		this.boxes.forEach(el => {
+			el.update()
+		})
 
 		// this.vehicles.forEach((vehicle) => {
 		// 	if (this.isOutOfBounds(vehicle.rayCastVehicle.chassisBody.position))
@@ -392,54 +391,19 @@ export class World
 							// Convex doesn't work! Stick to boxes!
 							if (child.userData.type === 'box')
 							{
-
-								console.log('child.name', child.name);
-								let mass = 0;
-								if (child.name === 'Cube001') {
-									mass = 10;
-								}
-
-								let phys = new BoxCollider({mass, size: new THREE.Vector3(child.scale.x, child.scale.y, child.scale.z)});
+								const mass = child.userData.name.match("Box") ? 1 : 0; 
+								let phys = new BoxCollider({mass,child, size: new THREE.Vector3(child.scale.x, child.scale.y, child.scale.z)});
+								
 								phys.body.position.copy(Utils.cannonVector(child.position));
 								phys.body.quaternion.copy(Utils.cannonQuat(child.quaternion));
 								phys.body.computeAABB();
 
-								// phys.body.shapes.forEach((shape) => {
-								// 	shape.collisionFilterMask = ~CollisionGroups.TrimeshColliders;
-								// });
+								phys.body.shapes.forEach((shape) => {
+									shape.collisionFilterMask = ~CollisionGroups.TrimeshColliders;
+								});
 
-								if (child.name === 'Cube001') {
-									this.rotObj = phys;
-									this.rotObj.options.obj3d = child.parent.getObjectByName('Cube004');
-								}
-
-								if (child.name === 'Cube009') {
-									this.floor = phys;
-									this.floor.options.obj3d = child.parent.getObjectByName('Cube010');
-
-
-									const box3A = new THREE.Box3().setFromObject(this.floor.options.obj3d);
-									const box3B = new THREE.Box3().setFromObject(this.rotObj.options.obj3d);
-									// const motor = new CANNON.RigidVehicle({chassisBody: phys.body});
-									console.log(this.floor.body, this.rotObj.body,)
-									this.wheel = new CANNON.HingeConstraint(
-										this.floor.body, this.rotObj.body,
-										{
-											pivotA: new CANNON.Vec3(0, box3A.getSize(new THREE.Vector3()).y, 0),
-											pivotB: new CANNON.Vec3(0, -box3B.getSize(new THREE.Vector3()).y, 0),
-											axisA: new CANNON.Vec3(0, 1, 0),
-											axisB: new CANNON.Vec3(0, 1, 0),
-										}
-									);
-									// console.log('motor', motor);
-									// setTimeout(() => )
-									// this.physicsWorld.addConstraint(this.wheel);
-									this.wheel.enableMotor();
-									// @ts-ignore
-									this.wheel.setMotorSpeed(2);
-								}
-								console.log(phys)
-
+								if(!child.userData.static) this.boxes.push(phys);
+								
 								this.physicsWorld.addBody(phys.body);
 							}
 							else if (child.userData.type === 'trimesh')
@@ -447,8 +411,6 @@ export class World
 								let phys = new TrimeshCollider(child, {});
 								this.physicsWorld.addBody(phys.body);
 							}
-
-							child.visible = false;
 						}
 					}
 
