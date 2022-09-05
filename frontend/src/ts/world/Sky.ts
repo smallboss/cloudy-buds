@@ -40,7 +40,7 @@ export class Sky extends THREE.Object3D implements IUpdatable
 		super();
 
 		this.world = world;
-		
+
 		// Sky material
 		this.skyMaterial = new THREE.ShaderMaterial({
 			uniforms: THREE.UniformsUtils.clone(SkyShader.uniforms),
@@ -96,12 +96,15 @@ export class Sky extends THREE.Object3D implements IUpdatable
 			camera: world.camera,
 			parent: world.graphicsWorld,
 			mode: 'custom',
+			shadowBias: -0.000035,
 			customSplitsCallback: splitsCallback
 		});
 		this.csm.fade = true;
 
+		console.log('this.csm', this.csm);
+
 		this.refreshSunPosition();
-		
+
 		world.graphicsWorld.add(this);
 		world.registerUpdatable(this);
 	}

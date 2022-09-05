@@ -70,9 +70,9 @@ export class World
 	public scenarioGUIFolder: any;
 	public updatables: IUpdatable[] = [];
 	public wheel: CANNON.HingeConstraint;
-	public hammers: HammerCollider[] = []
-	public kettlebells: KettlebellCollider[] = []
-	public boxes: BoxCollider[] = []
+	public hammers: HammerCollider[] = [];
+	public kettlebells: KettlebellCollider[] = [];
+	public boxes: BoxCollider[] = [];
 
 	private lastScenarioID: string;
 
@@ -97,10 +97,10 @@ export class World
 		this.renderer = new THREE.WebGLRenderer({antialias: true});
 		this.renderer.setPixelRatio(window.devicePixelRatio);
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
-		this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+		// this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
 		this.renderer.toneMappingExposure = 1.0;
-		// this.renderer.shadowMap.enabled = true;
-		// this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+		this.renderer.shadowMap.enabled = true;
+		this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 		this.generateHTML();
 
@@ -394,9 +394,9 @@ export class World
 							// Convex doesn't work! Stick to boxes!
 							if (child.userData.type === 'box')
 							{
-								const mass = child.userData.name.match("Box") ? 1 : 0; 
+								const mass = child.userData.name.match("Box") ? 1 : 0;
 								let phys = new BoxCollider({mass,child, size: new THREE.Vector3(child.scale.x, child.scale.y, child.scale.z)});
-								
+
 								phys.body.position.copy(Utils.cannonVector(child.position));
 								phys.body.quaternion.copy(Utils.cannonQuat(child.quaternion));
 								phys.body.computeAABB();
@@ -406,7 +406,7 @@ export class World
 								});
 
 								if(!child.userData.static) this.boxes.push(phys);
-								
+
 								this.physicsWorld.addBody(phys.body);
 							}
 							else if (child.userData.type === 'trimesh')

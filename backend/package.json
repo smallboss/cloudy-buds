@@ -1,8 +1,9 @@
 {
   "name": "skybuds backend",
   "version": "0.0.1",
-  "description": "The Neighbour Meta",
+  "description": "skybuds backend",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "nodemon",
     "prettier": "prettier --config .prettierrc 'src/**/*.ts' --write",
@@ -21,6 +22,8 @@
     "typescript": "^4.6.3"
   },
   "dependencies": {
+    "@geckos.io/server": "^2.2.3",
+    "@geckos.io/snapshot-interpolation": "^1.1.0",
     "@typescript-eslint/eslint-plugin": "^5.17.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",

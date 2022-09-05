@@ -171,8 +171,8 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.colliding();
 
 		if (scenario) {
-			this.initSockets();
-			this.updateSocket();
+			// this.initSockets();
+			// this.updateSocket();
 		}
 	}
 
