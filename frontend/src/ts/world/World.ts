@@ -5,13 +5,8 @@ import * as $ from 'jquery';
 import * as TWEEN from '@tweenjs/tween.js';
 
 import { CameraOperator } from '../core/CameraOperator';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
-import { FXAAShader  } from 'three/examples/jsm/shaders/FXAAShader';
 
 import { Detector } from '../../lib/utils/Detector';
-import { Stats } from '../../lib/utils/Stats';
 import * as GUI from '../../lib/utils/dat.gui';
 import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';
 import * as _ from 'lodash';
@@ -42,8 +37,6 @@ export class World
 {
 	public renderer: THREE.WebGLRenderer;
 	public camera: THREE.PerspectiveCamera;
-	public composer: any;
-	public stats: Stats;
 	public graphicsWorld: THREE.Scene;
 	public sky: Sky;
 	public physicsWorld: CANNON.World;
@@ -67,7 +60,7 @@ export class World
 	public characters: Character[] = [];
 	// public vehicles: Vehicle[] = [];
 	public paths: Path[] = [];
-	public scenarioGUIFolder: any;
+	//public scenarioGUIFolder: any;
 	public updatables: IUpdatable[] = [];
 	public wheel: CANNON.HingeConstraint;
 	public hammers: HammerCollider[] = []
@@ -110,28 +103,12 @@ export class World
 			scope.camera.aspect = window.innerWidth / window.innerHeight;
 			scope.camera.updateProjectionMatrix();
 			scope.renderer.setSize(window.innerWidth, window.innerHeight);
-			// fxaaPass.uniforms['resolution'].value.set(1 / (window.innerWidth * pixelRatio), 1 / (window.innerHeight * pixelRatio));
-			// scope.composer.setSize(window.innerWidth * pixelRatio, window.innerHeight * pixelRatio);
 		}
 		window.addEventListener('resize', onWindowResize, false);
 
 		// Three.js scene
 		this.graphicsWorld = new THREE.Scene();
 		this.camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1010);
-
-		// Passes
-		// let renderPass = new RenderPass( this.graphicsWorld, this.camera );
-		// let fxaaPass = new ShaderPass( FXAAShader );
-
-		// FXAA
-		// let pixelRatio = this.renderer.getPixelRatio();
-		// fxaaPass.material['uniforms'].resolution.value.x = 1 / ( window.innerWidth * pixelRatio );
-		// fxaaPass.material['uniforms'].resolution.value.y = 1 / ( window.innerHeight * pixelRatio );
-
-		// Composer
-		// this.composer = new EffectComposer( this.renderer );
-		// this.composer.addPass( renderPass );
-		// this.composer.addPass( fxaaPass );
 
 		// Physics
 		this.physicsWorld = new CANNON.World();
@@ -152,8 +129,6 @@ export class World
 		this.sinceLastFrame = 0;
 		this.justRendered = false;
 
-		// Stats (FPS, Frame time, Memory)
-		this.stats = Stats();
 		// Create right panel GUI
 		this.createParamsGUI(scope);
 
@@ -170,17 +145,7 @@ export class World
 			{
 				this.update(1, 1);
 				this.setTimeScale(1);
-
-				Swal.fire({
-					title: 'Welcome to Sketchbook!',
-					text: 'Feel free to explore the world and interact with available vehicles. There are also various scenarios ready to launch from the right panel.',
-					footer: '<a href="https://github.com/swift502/Sketchbook" target="_blank">GitHub page</a><a href="https://discord.gg/fGuEqCe" target="_blank">Discord server</a>',
-					confirmButtonText: 'Okay',
-					buttonsStyling: false,
-					onClose: () => {
-						UIManager.setUserInterfaceVisible(true);
-					}
-				});
+				UIManager.setUserInterfaceVisible(true);
 			};
 			loadingManager.loadGLTF(worldScenePath, (gltf) => {
 				this.loadScene(loadingManager, gltf);
@@ -307,12 +272,7 @@ export class World
 		this.sinceLastFrame += this.requestDelta + this.renderDelta + this.logicDelta;
 		this.sinceLastFrame %= interval;
 
-		// Stats end
-		this.stats.end();
-		this.stats.begin();
-
 		// Actual rendering with a FXAA ON/OFF switch
-		// if (this.params.FXAA) this.composer.render();
 		// else
 			this.renderer.render(this.graphicsWorld, this.camera);
 
@@ -537,7 +497,7 @@ export class World
 		// Loader
 		$(`	<div id="loading-screen">
 				<div id="loading-screen-background"></div>
-				<h1 id="main-title" class="sb-font">Sketchbook 0.4</h1>
+				<h1 id="main-title" class="sb-font">Skybuds</h1>
 				<div class="cubeWrap">
 					<div class="cube">
 						<div class="faces1"></div>
@@ -579,18 +539,13 @@ export class World
 			Mouse_Sensitivity: 0.3,
 			Time_Scale: 1,
 			Shadows: true,
-			FXAA: true,
 			Debug_Physics: false,
-			Debug_FPS: false,
 			Sun_Elevation: 50,
 			Sun_Rotation: 145,
 		};
 
 		const gui = new GUI.GUI();
 
-		// Scenario
-		this.scenarioGUIFolder = gui.addFolder('Scenarios');
-		this.scenarioGUIFolder.open();
 
 		// World
 		let worldFolder = gui.addFolder('World');
@@ -612,7 +567,6 @@ export class World
 
 		// Input
 		let settingsFolder = gui.addFolder('Settings');
-		settingsFolder.add(this.params, 'FXAA');
 		settingsFolder.add(this.params, 'Shadows')
 			.onChange((enabled) =>
 			{
@@ -656,11 +610,6 @@ export class World
 				{
 					char.raycastBox.visible = enabled;
 				});
-			});
-		settingsFolder.add(this.params, 'Debug_FPS')
-			.onChange((enabled) =>
-			{
-				UIManager.setFPSVisible(enabled);
 			});
 
 		gui.open();

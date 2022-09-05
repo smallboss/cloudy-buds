@@ -118,7 +118,6 @@ export class Scenario
 		{
 			this.world.launchScenario(this.id);
 		};
-		this.world.scenarioGUIFolder.add(this.world.params, this.name);
 	}
 
 	public launch(loadingManager: LoadingManager, world: World): void

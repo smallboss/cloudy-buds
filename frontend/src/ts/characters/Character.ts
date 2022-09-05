@@ -581,10 +581,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
 				desc: 'Jump'
 			},
 			{
-				keys: ['F', 'or', 'G'],
-				desc: 'Enter vehicle'
-			},
-			{
 				keys: ['Shift', '+', 'R'],
 				desc: 'Respawn'
 			},
