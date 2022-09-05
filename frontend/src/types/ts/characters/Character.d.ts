@@ -11,6 +11,7 @@ import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { CapsuleCollider } from '../physics/colliders/CapsuleCollider';
 import { GroundImpactData } from './GroundImpactData';
 import { EntityType } from '../enums/EntityType';
+import { Scenario } from "../world/Scenario";
 export declare class Character extends THREE.Object3D implements IWorldEntity {
     updateOrder: number;
     entityType: EntityType;
@@ -51,9 +52,18 @@ export declare class Character extends THREE.Object3D implements IWorldEntity {
     world: World;
     charState: ICharacterState;
     behaviour: ICharacterAI;
+    playerId: string;
+    scenario: Scenario;
+    currAnimationData: {
+        clipName?: string;
+        fadeIn?: number;
+    };
     controlledObject: IControllable;
+    socket: any;
     private physicsEnabled;
-    constructor(gltf: any);
+    constructor(gltf: any, scenario?: Scenario);
+    initSockets(): void;
+    updateSocket(): void;
     colliding: () => void;
     setAnimations(animations: []): void;
     setArcadeVelocityInfluence(x: number, y?: number, z?: number): void;

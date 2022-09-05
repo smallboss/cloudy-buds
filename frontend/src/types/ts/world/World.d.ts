@@ -12,6 +12,7 @@ import { Character } from '../characters/Character';
 import { Path } from './Path';
 import { BoxCollider } from '../physics/colliders/BoxCollider';
 import { HammerCollider } from '../physics/colliders/HammerCollider';
+import { KettlebellCollider } from '../physics/colliders/KettlebellCollider';
 import { Scenario } from './Scenario';
 import { Sky } from './Sky';
 export declare class World {
@@ -43,10 +44,10 @@ export declare class World {
     paths: Path[];
     scenarioGUIFolder: any;
     updatables: IUpdatable[];
-    rotObj: BoxCollider;
-    floor: BoxCollider;
     wheel: CANNON.HingeConstraint;
     hammers: HammerCollider[];
+    kettlebells: KettlebellCollider[];
+    boxes: BoxCollider[];
     private lastScenarioID;
     constructor(worldScenePath?: any);
     update(timeStep: number, unscaledTimeStep: number): void;

@@ -7,7 +7,7 @@ export declare class LoadingManager {
     private world;
     private gltfLoader;
     private loadingTracker;
-    constructor(world: World);
+    constructor(world?: World);
     loadGLTF(path: string, onLoadingFinished: (gltf: any) => void): void;
     addLoadingEntry(path: string): LoadingTrackerEntry;
     doneLoading(trackerEntry: LoadingTrackerEntry): void;

@@ -6,4 +6,5 @@ export declare class BoxCollider implements ICollider {
     body: CANNON.Body;
     debugModel: THREE.Mesh;
     constructor(options: any);
+    update: () => void;
 }
