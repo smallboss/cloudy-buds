@@ -28,7 +28,7 @@ export class KettlebellCollider implements ICollider {
       mass: 1000,
       shape: new CANNON.Sphere(kettlebellRadius),
       position: mesh.position.clone().setY(kettlebellRadius),
-      velocity: new CANNON.Vec3(+mesh.userData.rtl ? 10 : -10, 0, 0)
+      velocity: new CANNON.Vec3(+mesh.userData.rtl ? 10 : -10, -1, -1)
     });
 
     this.kettlebell = new CANNON.HingeConstraint(this.hitch ,this.body,
