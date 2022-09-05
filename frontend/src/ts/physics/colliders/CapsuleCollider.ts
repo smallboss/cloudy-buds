@@ -14,7 +14,7 @@ export class CapsuleCollider implements ICollider
 		let defaults = {
 			mass: 0,
 			position: new CANNON.Vec3(),
-			height: 0.5,
+			height: 0.7,
 			radius: 0.3,
 			segments: 8,
 			friction: 0.3
@@ -37,9 +37,10 @@ export class CapsuleCollider implements ICollider
 		capsuleBody.material = mat;
 		// sphereShape.material = mat;
 
-		capsuleBody.addShape(sphereShape, new CANNON.Vec3(0, 0, 0));
-		capsuleBody.addShape(sphereShape, new CANNON.Vec3(0, options.height / 2, 0));
-		capsuleBody.addShape(sphereShape, new CANNON.Vec3(0, -options.height / 2, 0));
+		// TODO: calc shape for each character type individual
+		capsuleBody.addShape(sphereShape, new CANNON.Vec3(0, 0.45, -0.1)); // top
+		capsuleBody.addShape(sphereShape, new CANNON.Vec3(0, 0.05, 0)); // center
+		capsuleBody.addShape(sphereShape, new CANNON.Vec3(0, -0.35, 0)); // bottom
 
 		this.body = capsuleBody;
 	}
