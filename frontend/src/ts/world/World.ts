@@ -68,8 +68,6 @@ export class World
 	public paths: Path[] = [];
 	public scenarioGUIFolder: any;
 	public updatables: IUpdatable[] = [];
-	public rotObj: BoxCollider;
-	public floor: BoxCollider;
 	public wheel: CANNON.HingeConstraint;
 	public hammers: HammerCollider[] = []
 	public kettlebells: KettlebellCollider[] = []
@@ -356,11 +354,9 @@ export class World
 		gltf.scene.traverse((child) => {
 			if(child.name.match('Hammer')){
 				let hammer = new HammerCollider(child);
-				console.log(child.userData.clockwise)
 				this.physicsWorld.addBody(hammer.bottom);
 				this.physicsWorld.addBody(hammer.body);
 				this.physicsWorld.addConstraint(hammer.hammer);
-				//@ts-ignore
 				hammer.hammer.enableMotor();
 				//@ts-ignore
 				hammer.hammer.setMotorSpeed(+child.userData.clockwise ? 5 : -5);
@@ -470,7 +466,6 @@ export class World
 		});
 
 		this.graphicsWorld.add(gltf.scene);
-		this.graphicsWorld.add(new THREE.AxesHelper(3))
 
 		// Launch default scenario
 		let defaultScenarioID: string;
