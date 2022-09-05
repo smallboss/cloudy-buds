@@ -27,6 +27,7 @@ import { Path } from './Path';
 import { CollisionGroups } from '../enums/CollisionGroups';
 import { BoxCollider } from '../physics/colliders/BoxCollider';
 import { HammerCollider } from '../physics/colliders/HammerCollider';
+import { KettlebellCollider } from '../physics/colliders/KettlebellCollider';
 import { TrimeshCollider } from '../physics/colliders/TrimeshCollider';
 import { Scenario } from './Scenario';
 import { Sky } from './Sky';
@@ -71,6 +72,7 @@ export class World
 	public floor: BoxCollider;
 	public wheel: CANNON.HingeConstraint;
 	public hammers: HammerCollider[] = []
+	public kettlebells: KettlebellCollider[] = []
 
 	private lastScenarioID: string;
 
@@ -364,9 +366,15 @@ export class World
 				hammer.hammer.setMotorSpeed(+child.userData.clockwise ? 5 : -5);
 				hammer.hammer.collideConnected = false
 				this.hammers.push(hammer)
-
-
-			} else if (child.hasOwnProperty('userData'))
+			} else if(child.name.match('Kettlebell')){
+					let kettlebell = new KettlebellCollider(child);
+					this.physicsWorld.addBody(kettlebell.hitch);
+					this.physicsWorld.addBody(kettlebell.body);
+					this.physicsWorld.addConstraint(kettlebell.kettlebell);
+					kettlebell.kettlebell.enableMotor();
+					this.kettlebells.push(kettlebell)
+			}
+			else if (child.hasOwnProperty('userData'))
 			{
 				if (child.type === 'Mesh')
 				{
