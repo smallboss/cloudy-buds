@@ -2,6 +2,7 @@ import { ISpawnPoint } from '../interfaces/ISpawnPoint';
 import { CharacterSpawnPoint } from './CharacterSpawnPoint';
 import { World } from '../world/World';
 import { LoadingManager } from '../core/LoadingManager';
+import * as THREE from 'three';
 
 export class Scenario
 {
@@ -17,12 +18,18 @@ export class Scenario
 	private spawnPoints: ISpawnPoint[] = [];
 	private invisible: boolean = false;
 	private initialCameraAngle: number;
+	public localPlayer: CharacterSpawnPoint;
+
+	public characterSpawnPointList: CharacterSpawnPoint[] = [];
+	public remoteData: any = [];
 
 	constructor(root: THREE.Object3D, world: World)
 	{
 		this.rootNode = root;
 		this.world = world;
 		this.id = root.name;
+
+		// characterSpawnPointList
 
 		// Scenario
 		if (root.userData.hasOwnProperty('name'))
@@ -64,18 +71,45 @@ export class Scenario
 				{
 					if (child.userData.type === 'player')
 					{
-						let sp = new CharacterSpawnPoint(child, true);
-						this.spawnPoints.push(sp);
+						this.localPlayer = new CharacterSpawnPoint(child, this);
+						this.spawnPoints.push(this.localPlayer);
 
-						[...new Array(3)].forEach(el => {
-							const characterSpawn = new CharacterSpawnPoint(child);
-							console.log('characterSpawn', characterSpawn);
-							this.spawnPoints.push(characterSpawn);
-						});
+						// [...new Array(3)].forEach(el => {
+						// 	const characterSpawn = new CharacterSpawnPoint(child);
+						// 	console.log('characterSpawn', characterSpawn);
+						// 	this.spawnPoints.push(characterSpawn);
+						// });
 					}
 				}
 			}
 		});
+
+		this.updateRemotePlayers();
+	}
+
+	updateRemotePlayers() {
+		requestAnimationFrame(() => this.updateRemotePlayers());
+
+		const remotePlayers: CharacterSpawnPoint[] = [];
+
+		// console.log('this.remoteData', this.remoteData);
+		// console.log('this.characterSpawnPointList', this.characterSpawnPointList);
+
+		this.remoteData.forEach((data: any) => {
+			if (data.id === this.localPlayer.character.playerId) return;
+
+			const rplayerSpawn = this.characterSpawnPointList.find(({playerId}) => playerId === data.id);
+			if (rplayerSpawn === undefined) {
+				const newPlayer = new CharacterSpawnPoint(this.localPlayer.object, undefined, data.id);
+				newPlayer.spawn(new LoadingManager(), this.world);
+				remotePlayers.push(newPlayer);
+			}
+			else {
+				remotePlayers.push(rplayerSpawn);
+			}
+		});
+
+		this.characterSpawnPointList = [...remotePlayers];
 	}
 
 	public createLaunchLink(): void

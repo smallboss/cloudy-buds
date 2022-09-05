@@ -9,20 +9,23 @@ import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {FBXLoader} from "three/examples/jsm/loaders/FBXLoader";
 import {Walk} from "../characters/character_states/Walk";
 import {StartWalkLeft} from "../characters/character_states/StartWalkLeft";
+import {Scenario} from "./Scenario";
 // import path from '../../assets/models/boxman_.glb';
 
 const randomBetween = (min, max) => Math.floor(Math.random() * (max - min)) + min;
 
 export class CharacterSpawnPoint implements ISpawnPoint
 {
-	private object: THREE.Object3D;
-	public isPlayer: boolean = false;
+	public object: THREE.Object3D;
+	public scenario: Scenario;
 	public character: Character;
+	public playerId: string;
 
-	constructor(object: THREE.Object3D, isPlayer: boolean = false)
+	constructor(object: THREE.Object3D, scenario?: Scenario, playerId?: string)
 	{
 		this.object = object;
-		this.isPlayer = isPlayer;
+		this.scenario = scenario;
+		this.playerId = playerId;
 	}
 
 	public spawn(loadingManager: LoadingManager, world: World): void
@@ -36,12 +39,12 @@ export class CharacterSpawnPoint implements ISpawnPoint
 			model.scene = modelMan.scene;
 
 
-			let player = new Character(model);
+			let player = new Character(model, this.scenario);
 			this.character = player;
 
 			let worldPos = new THREE.Vector3();
 			this.object.getWorldPosition(worldPos);
-			if (!this.isPlayer) {
+			if (!this.scenario) {
 				worldPos.copy(worldPos.clone().add(new THREE.Vector3(randomBetween(-5, 5), randomBetween(-5, 5), randomBetween(-5, 5))));
 			}
 			player.setPosition(worldPos.x, worldPos.y, worldPos.z);
@@ -50,7 +53,7 @@ export class CharacterSpawnPoint implements ISpawnPoint
 			player.setOrientation(forward, true);
 
 			world.add(player);
-			if (this.isPlayer) player.takeControl();
+			if (this.scenario) player.takeControl();
 		});
 	}
 
