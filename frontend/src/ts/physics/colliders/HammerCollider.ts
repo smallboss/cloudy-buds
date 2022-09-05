@@ -8,7 +8,7 @@ export class HammerCollider implements ICollider {
   public mesh: THREE.Mesh
 
   constructor(mesh) {
-    let mat = new CANNON.Material('HammerMat');
+    let mat = new CANNON.Material('DynamicBarrierMat');
     mat.friction = 0;
     mat.restitution = 0;
 

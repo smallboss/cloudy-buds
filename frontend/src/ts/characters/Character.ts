@@ -160,7 +160,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 	public colliding = () => {
 		this.characterCapsule.body.addEventListener('collide', e => {
-			if(e.contact.bj.material.name === 'HammerMat'){
+			if(e.contact.bj.material.name === 'DynamicBarrierMat'){
 				this.setState(new DropRolling(this));
 			}
 		})
