@@ -81,7 +81,7 @@ export class Sky extends THREE.Object3D implements IUpdatable
 
 			for (let i = amount - 1; i >= 0; i--)
 			{
-				arr.push(Math.pow(1 / 4, i));
+				arr.push(Math.pow(1 / 3, i));
 			}
 
 			return arr;
@@ -89,13 +89,14 @@ export class Sky extends THREE.Object3D implements IUpdatable
 
 		this.csm = new CSM({
 			fov: 80,
-			far: 250,	// maxFar
+			far: 100,	// maxFar
 			lightIntensity: 2.5,
-			cascades: 3,
-			shadowMapSize: 2048,
+			cascades: 4,
+			shadowMapSize: 512 * 8,
 			camera: world.camera,
 			parent: world.graphicsWorld,
 			mode: 'custom',
+			shadowBias: -0.000025,
 			customSplitsCallback: splitsCallback
 		});
 		this.csm.fade = true;

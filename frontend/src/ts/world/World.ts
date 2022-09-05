@@ -99,8 +99,8 @@ export class World
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
 		this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
 		this.renderer.toneMappingExposure = 1.0;
-		// this.renderer.shadowMap.enabled = true;
-		// this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+		this.renderer.shadowMap.enabled = true;
+		this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 		this.generateHTML();
 
@@ -364,6 +364,8 @@ export class World
 				hammer.hammer.setMotorSpeed(+child.userData.clockwise ? 5 : -5);
 				hammer.hammer.collideConnected = false
 				this.hammers.push(hammer)
+				Utils.setupMeshProperties(child);
+				this.sky.csm.setupMaterial(child.material);
 			} else if(child.name.match('Kettlebell')){
 					let kettlebell = new KettlebellCollider(child);
 					this.physicsWorld.addBody(kettlebell.hitch);
@@ -406,6 +408,9 @@ export class World
 								});
 
 								if(!child.userData.static) this.boxes.push(phys);
+
+								Utils.setupMeshProperties(child);
+								this.sky.csm.setupMaterial(child.material);
 								
 								this.physicsWorld.addBody(phys.body);
 							}
