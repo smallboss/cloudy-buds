@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import Swal from 'sweetalert2';
 import * as $ from 'jquery';
+import * as TWEEN from '@tweenjs/tween.js';
 
 import { CameraOperator } from '../core/CameraOperator';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
@@ -315,6 +316,8 @@ export class World
 		// if (this.params.FXAA) this.composer.render();
 		// else
 			this.renderer.render(this.graphicsWorld, this.camera);
+
+		TWEEN.update();
 
 		// Measuring render time
 		this.renderDelta = this.clock.getDelta();

@@ -21,6 +21,11 @@ import { ClosestObjectFinder } from '../core/ClosestObjectFinder';
 import { Object3D } from 'three';
 import { EntityType } from '../enums/EntityType';
 import { DropRolling } from './character_states/DropRolling';
+import {io} from "socket.io-client";
+import {Scenario} from "../world/Scenario";
+import * as TWEEN from '@tweenjs/tween.js';
+import {CharacterSpawnPoint} from "../world/CharacterSpawnPoint";
+import {threeVector} from "../core/FunctionLibrary";
 
 export class Character extends THREE.Object3D implements IWorldEntity
 {
@@ -68,17 +73,25 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	public world: World;
 	public charState: ICharacterState;
 	public behaviour: ICharacterAI;
+	public playerId: string;
+	public scenario: Scenario;
+
+	public currAnimationData: {clipName?: string, fadeIn?: number} = {};
 
 	// Vehicles
 	public controlledObject: IControllable;
 	// public occupyingSeat: VehicleSeat = null;
 	// public vehicleEntryInstance: VehicleEntryInstance = null;
 
+	public socket: any;
+
 	private physicsEnabled: boolean = true;
 
-	constructor(gltf: any)
+	constructor(gltf: any, scenario?: Scenario)
 	{
 		super();
+
+		this.scenario = scenario;
 
 		this.readCharacterData(gltf);
 		this.setAnimations(gltf.animations);
@@ -155,7 +168,104 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 		// States
 		this.setState(new Idle(this));
-		this.colliding()
+		this.colliding();
+
+		if (scenario) {
+			this.initSockets();
+			this.updateSocket();
+		}
+	}
+
+	initSockets() {
+		console.log('initSockets');
+		this.socket = io();
+
+		this.socket.on('connect_error', (err: { message: string }) => {
+			console.log(`connect_error due to ${err.message}`);
+		});
+
+		this.socket.on('exit', () => {
+			setTimeout(() => window.location.reload(), 2000);
+		});
+
+		this.socket.on('setId', (data: { id: string }) => {
+			this.playerId = data.id;
+		});
+
+		const socketTween = new TWEEN.Tween({ alpha: 0 });
+
+		this.socket.on('remoteData', (data: any) => {
+			socketTween?.stop();
+
+			this.scenario.characterSpawnPointList.forEach((player) => {
+				if (!player?.character) return;
+				player.character.userData.startPos = threeVector(player.character.characterCapsule.body.position);
+			});
+
+			for (const playerData of data) {
+				let player = this.scenario.characterSpawnPointList.find(({playerId}) => playerId === playerData.id);
+				if (!player?.character) continue;
+
+				// player.character.setPosition(playerData.x, playerData.y, playerData.z);
+				// player.character.setArcadeVelocityTarget(playerData.velZ, playerData.velX, playerData.velY);
+				// player.character.setArcadeVelocityInfluence(playerData.velX, playerData.velY, playerData.velZ);
+				player.character.setOrientation(new THREE.Vector3(playerData.orX, playerData.orY, playerData.orZ), true);
+				if (playerData.clipName !== player.character.currAnimationData?.clipName) {
+					player.character.setAnimation(playerData.clipName, playerData.fadeIn);
+				}
+			}
+
+			socketTween
+				.to({ alpha: 1 }, Date.now() - this.scenario.remoteData.time + 20)
+				.easing(TWEEN.Easing.Linear.None)
+				.onUpdate((delta: any) => {
+					for (const playerData of data) {
+						const player = this.scenario.characterSpawnPointList.find(({playerId}) => playerId === playerData.id);
+						if (!player?.character) continue;
+
+						const startPos = player.character.userData.startPos.clone();
+						const endPos = new THREE.Vector3(playerData.x, playerData.y, playerData.z);
+						const currPos = startPos.lerp(endPos.clone(), delta.alpha);
+						player.character.setPosition(currPos.x, currPos.y, currPos.z);
+					}
+				})
+				.start();
+
+			socketTween.start();
+
+			this.scenario.remoteData = data;
+			this.scenario.remoteData.time = Date.now()
+		});
+
+		this.socket.on('deletePlayer', (data: any) => {});
+	}
+
+	updateSocket() {
+		requestAnimationFrame(() => this.updateSocket());
+
+		const position = this.characterCapsule.body.position;
+		// this.modelContainer?.getWorldPosition(position);
+		if (this.socket !== undefined && position) {
+			this.socket.emit('update', {
+				x: position.x,
+				y: position.y,
+				z: position.z,
+				velX: this.velocityTarget.x,
+				velY: this.velocityTarget.y,
+				velZ: this.velocityTarget.z,
+				orX: this.orientation.x,
+				orY: this.orientation.y,
+				orZ: this.orientation.z,
+				clipName: this.currAnimationData.clipName,
+				fadeIn: this.currAnimationData.fadeIn,
+				// h: this.game.carControls.root ? this.game.carControls.root.rotation.y + Math.PI : this.object?.rotation.y,
+				// pb: this.game.carControls.root ? this.game.carControls.root.rotation.x : this.object?.rotation.x,
+				// gender: this.gender,
+				// speak: this.speak,
+				// action: this.action,
+				// name: this.user.name
+			});
+		}
 	}
 
 	public colliding = () => {
@@ -514,6 +624,9 @@ export class Character extends THREE.Object3D implements IWorldEntity
 				return 0;
 			}
 
+			this.currAnimationData.clipName = clipName;
+			this.currAnimationData.fadeIn = fadeIn;
+
 			this.mixer.stopAllAction();
 			action.fadeIn(fadeIn);
 			action.play();
@@ -597,128 +710,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.initJumpSpeed = initJumpSpeed;
 	}
 
-	// public findVehicleToEnter(wantsToDrive: boolean): void
-	// {
-	// 	// reusable world position variable
-	// 	let worldPos = new THREE.Vector3();
-	//
-	// 	// Find best vehicle
-	// 	let vehicleFinder = new ClosestObjectFinder<Vehicle>(this.position, 10);
-	// 	this.world.vehicles.forEach((vehicle) =>
-	// 	{
-	// 		vehicleFinder.consider(vehicle, vehicle.position);
-	// 	});
-	//
-	// 	if (vehicleFinder.closestObject !== undefined)
-	// 	{
-	// 		let vehicle = vehicleFinder.closestObject;
-	// 		let vehicleEntryInstance = new VehicleEntryInstance(this);
-	// 		vehicleEntryInstance.wantsToDrive = wantsToDrive;
-	//
-	// 		// Find best seat
-	// 		let seatFinder = new ClosestObjectFinder<VehicleSeat>(this.position);
-	// 		for (const seat of vehicle.seats)
-	// 		{
-	// 			if (wantsToDrive)
-	// 			{
-	// 				// Consider driver seats
-	// 				if (seat.type === SeatType.Driver)
-	// 				{
-	// 					seat.seatPointObject.getWorldPosition(worldPos);
-	// 					seatFinder.consider(seat, worldPos);
-	// 				}
-	// 				// Consider passenger seats connected to driver seats
-	// 				else if (seat.type === SeatType.Passenger)
-	// 				{
-	// 					for (const connSeat of seat.connectedSeats)
-	// 					{
-	// 						if (connSeat.type === SeatType.Driver)
-	// 						{
-	// 							seat.seatPointObject.getWorldPosition(worldPos);
-	// 							seatFinder.consider(seat, worldPos);
-	// 							break;
-	// 						}
-	// 					}
-	// 				}
-	// 			}
-	// 			else
-	// 			{
-	// 				// Consider passenger seats
-	// 				if (seat.type === SeatType.Passenger)
-	// 				{
-	// 					seat.seatPointObject.getWorldPosition(worldPos);
-	// 					seatFinder.consider(seat, worldPos);
-	// 				}
-	// 			}
-	// 		}
-	//
-	// 		if (seatFinder.closestObject !== undefined)
-	// 		{
-	// 			let targetSeat = seatFinder.closestObject;
-	// 			vehicleEntryInstance.targetSeat = targetSeat;
-	//
-	// 			let entryPointFinder = new ClosestObjectFinder<Object3D>(this.position);
-	//
-	// 			for (const point of targetSeat.entryPoints) {
-	// 				point.getWorldPosition(worldPos);
-	// 				entryPointFinder.consider(point, worldPos);
-	// 			}
-	//
-	// 			if (entryPointFinder.closestObject !== undefined)
-	// 			{
-	// 				vehicleEntryInstance.entryPoint = entryPointFinder.closestObject;
-	// 				this.triggerAction('up', true);
-	// 				this.vehicleEntryInstance = vehicleEntryInstance;
-	// 			}
-	// 		}
-	// 	}
-	// }
-
-	// public enterVehicle(seat: VehicleSeat, entryPoint: THREE.Object3D): void
-	// {
-	// 	this.resetControls();
-	//
-	// 	if (seat.door?.rotation < 0.5)
-	// 	{
-	// 		this.setState(new OpenVehicleDoor(this, seat, entryPoint));
-	// 	}
-	// 	else
-	// 	{
-	// 		this.setState(new EnteringVehicle(this, seat, entryPoint));
-	// 	}
-	// }
-
-	// public teleportToVehicle(vehicle: Vehicle, seat: VehicleSeat): void
-	// {
-	// 	this.resetVelocity();
-	// 	this.rotateModel();
-	// 	this.setPhysicsEnabled(false);
-	// 	(vehicle as unknown as THREE.Object3D).attach(this);
-	//
-	// 	this.setPosition(seat.seatPointObject.position.x, seat.seatPointObject.position.y + 0.6, seat.seatPointObject.position.z);
-	// 	this.quaternion.copy(seat.seatPointObject.quaternion);
-	//
-	// 	this.occupySeat(seat);
-	// 	this.setState(new Driving(this, seat));
-	//
-	// 	this.startControllingVehicle(vehicle, seat);
-	// }
-
-	// public startControllingVehicle(vehicle: IControllable, seat: VehicleSeat): void
-	// {
-	// 	if (this.controlledObject !== vehicle)
-	// 	{
-	// 		this.transferControls(vehicle);
-	// 		this.resetControls();
-	//
-	// 		this.controlledObject = vehicle;
-	// 		this.controlledObject.allowSleep(false);
-	// 		vehicle.inputReceiverInit();
-	//
-	// 		vehicle.controllingCharacter = this;
-	// 	}
-	// }
-
 	public transferControls(entity: IControllable): void
 	{
 		// Currently running through all actions of this character and the vehicle,
@@ -758,38 +749,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			this.inputReceiverInit();
 		}
 	}
-
-	// public exitVehicle(): void
-	// {
-	// 	if (this.occupyingSeat !== null)
-	// 	{
-	// 		if (this.occupyingSeat.vehicle.entityType === EntityType.Airplane)
-	// 		{
-	// 			this.setState(new ExitingAirplane(this, this.occupyingSeat));
-	// 		}
-	// 		else
-	// 		{
-	// 			this.setState(new ExitingVehicle(this, this.occupyingSeat));
-	// 		}
-	//
-	// 		this.stopControllingVehicle();
-	// 	}
-	// }
-	//
-	// public occupySeat(seat: VehicleSeat): void
-	// {
-	// 	this.occupyingSeat = seat;
-	// 	seat.occupiedBy = this;
-	// }
-
-	// public leaveSeat(): void
-	// {
-	// 	if (this.occupyingSeat !== null)
-	// 	{
-	// 		this.occupyingSeat.occupiedBy = null;
-	// 		this.occupyingSeat = null;
-	// 	}
-	// }
 
 	public physicsPreStep(body: CANNON.Body, character: Character): void
 	{

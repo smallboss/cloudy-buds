@@ -9,19 +9,21 @@ export class LoadingManager
 {
 	public firstLoad: boolean = true;
 	public onFinishedCallback: () => void;
-	
+
 	private world: World;
 	private gltfLoader: GLTFLoader;
 	private loadingTracker: LoadingTrackerEntry[] = [];
 
-	constructor(world: World)
+	constructor(world?: World)
 	{
 		this.world = world;
 		this.gltfLoader = new GLTFLoader();
 
-		this.world.setTimeScale(0);
-		UIManager.setUserInterfaceVisible(false);
-		UIManager.setLoadingScreenVisible(true);
+		if (this.world) {
+			this.world.setTimeScale(0);
+			UIManager.setUserInterfaceVisible(false);
+			UIManager.setLoadingScreenVisible(true);
+		}
 	}
 
 	public loadGLTF(path: string, onLoadingFinished: (gltf: any) => void): void
@@ -62,7 +64,7 @@ export class LoadingManager
 
 		if (this.isLoadingDone())
 		{
-			if (this.onFinishedCallback !== undefined) 
+			if (this.onFinishedCallback !== undefined)
 			{
 				this.onFinishedCallback();
 			}
@@ -81,15 +83,15 @@ export class LoadingManager
 		{
 			this.onFinishedCallback = () =>
 			{
-				this.world.update(1, 1);
-	
+				this.world?.update(1, 1);
+
 				Swal.fire({
 					title: scenario.descriptionTitle,
 					html: scenario.descriptionContent,
 					confirmButtonText: 'Play',
 					buttonsStyling: false,
 					onClose: () => {
-						this.world.setTimeScale(1);
+						this.world?.setTimeScale(1);
 						UIManager.setUserInterfaceVisible(true);
 					}
 				});
