@@ -137,6 +137,11 @@ export class World
 		this.cameraOperator = new CameraOperator(this, this.camera, this.params.Mouse_Sensitivity);
 		this.sky = new Sky(this);
 
+		//disable shadows by default
+		this.sky.csm.lights.forEach((light) => {
+			light.castShadow = false;
+		});
+
 		// Load scene if path is supplied
 		if (worldScenePath !== undefined)
 		{
@@ -538,7 +543,7 @@ export class World
 			Pointer_Lock: true,
 			Mouse_Sensitivity: 0.3,
 			Time_Scale: 1,
-			Shadows: true,
+			Shadows: false,
 			Debug_Physics: false,
 			Sun_Elevation: 50,
 			Sun_Rotation: 145,
