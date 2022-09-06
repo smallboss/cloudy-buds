@@ -558,7 +558,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			return;
 		}
 
-		this.world.cameraOperator.setRadius(1.6, true);
+		this.world.cameraOperator.setRadius(3, true);
 		this.world.cameraOperator.followMode = false;
 		// this.world.dirLight.target = this;
 
@@ -579,10 +579,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			{
 				keys: ['Space'],
 				desc: 'Jump'
-			},
-			{
-				keys: ['F', 'or', 'G'],
-				desc: 'Enter vehicle'
 			},
 			{
 				keys: ['Shift', '+', 'R'],

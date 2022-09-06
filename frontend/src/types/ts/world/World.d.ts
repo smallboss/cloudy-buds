@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import { CameraOperator } from '../core/CameraOperator';
-import { Stats } from '../../lib/utils/Stats';
 import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';
 import { InputManager } from '../core/InputManager';
 import { LoadingManager } from '../core/LoadingManager';
@@ -18,8 +17,6 @@ import { Sky } from './Sky';
 export declare class World {
     renderer: THREE.WebGLRenderer;
     camera: THREE.PerspectiveCamera;
-    composer: any;
-    stats: Stats;
     graphicsWorld: THREE.Scene;
     sky: Sky;
     physicsWorld: CANNON.World;
@@ -42,7 +39,6 @@ export declare class World {
     scenarios: Scenario[];
     characters: Character[];
     paths: Path[];
-    scenarioGUIFolder: any;
     updatables: IUpdatable[];
     wheel: CANNON.HingeConstraint;
     hammers: HammerCollider[];

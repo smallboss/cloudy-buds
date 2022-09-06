@@ -40,7 +40,8 @@ export class CapsuleCollider implements ICollider
 		// TODO: calc shape for each character type individual
 		capsuleBody.addShape(sphereShape, new CANNON.Vec3(0, 0.45, -0.1)); // top
 		capsuleBody.addShape(sphereShape, new CANNON.Vec3(0, 0.05, 0)); // center
-		capsuleBody.addShape(sphereShape, new CANNON.Vec3(0, -0.35, 0)); // bottom
+		capsuleBody.addShape(sphereShape, new CANNON.Vec3(0, -0.25, 0)); // bottom
+
 
 		this.body = capsuleBody;
 	}
