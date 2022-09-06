@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "sourceMap": true,
         "outDir": "./dist/",
         "module": "es6",
         "target": "es2017",

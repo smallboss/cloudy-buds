@@ -5,6 +5,7 @@ const CopyPlugin = require("copy-webpack-plugin");
 
 const config = {
   entry: './src/index.ts',
+  devtool: 'source-map',
   devServer: {
     // https: true,
     static: {
