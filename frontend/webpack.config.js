@@ -12,17 +12,17 @@ const config = {
       directory: path.join(__dirname, 'dist'),
     },
     proxy: {
-      '/socket.io': {
-        // target: 'https://t3d.22k.space',
-        target: 'http://localhost:3001',
-        changeOrigin: true,
-        ws: true
-      },
-      '/api': {
-        // target: 'https://t3d.22k.space',
-        target: 'http://localhost:3001',
-        changeOrigin: true,
-      }
+      // '/socket.io': {
+      //   // target: 'https://t3d.22k.space',
+      //   target: 'http://localhost:3001',
+      //   changeOrigin: true,
+      //   ws: true
+      // },
+      // '/api': {
+      //   // target: 'https://t3d.22k.space',
+      //   target: 'http://localhost:3001',
+      //   changeOrigin: true,
+      // }
     },
     compress: true,
     port: 3000,

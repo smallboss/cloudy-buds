@@ -173,6 +173,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		if (scenario) {
 			// this.initSockets();
 			// this.updateSocket();
+			// this.triggerAction(action, pressed);
 		}
 	}
 
@@ -416,7 +417,8 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 						if (_.includes(binding.eventCodes, code))
 						{
-							this.triggerAction(action, pressed);
+							window['channel'].emit('playerAction', {action, pressed});
+							// this.triggerAction(action, pressed);
 						}
 					}
 				}
@@ -866,6 +868,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		// Jumping
 		if (character.wantsToJump)
 		{
+			console.log('character.initJumpSpeed', character.initJumpSpeed);
 			// If initJumpSpeed is set
 			if (character.initJumpSpeed > -1)
 			{
@@ -882,7 +885,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			}
 
 			// Add positive vertical velocity
-			body.velocity.y += 4;
+			body.velocity.y += 6; //4
 			// Move above ground by 2x safe offset value
 			body.position.y += character.raySafeOffset * 2;
 			// Reset flag

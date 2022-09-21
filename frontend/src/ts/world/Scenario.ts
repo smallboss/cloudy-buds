@@ -71,6 +71,7 @@ export class Scenario
 				{
 					if (child.userData.type === 'player')
 					{
+						console.log('child.userData.type >>>>>>');
 						this.localPlayer = new CharacterSpawnPoint(child, this);
 						this.spawnPoints.push(this.localPlayer);
 

@@ -56,5 +56,7 @@ export class HammerCollider implements ICollider {
   update = () => {
     //@ts-ignore
     this.mesh.quaternion.copy(this.body.quaternion)
+    //@ts-ignore
+    // this.mesh.position.copy(this.body.position)
   }
 }

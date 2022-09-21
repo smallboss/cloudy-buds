@@ -21,11 +21,12 @@ export class CharacterSpawnPoint implements ISpawnPoint
 	public character: Character;
 	public playerId: string;
 
-	constructor(object: THREE.Object3D, scenario?: Scenario, playerId?: string)
-	{
+	constructor(object: THREE.Object3D, scenario?: Scenario, playerId?: string) {
 		this.object = object;
 		this.scenario = scenario;
 		this.playerId = playerId;
+
+		console.log('CharacterSpawnPoint');
 	}
 
 	public spawn(loadingManager: LoadingManager, world: World): void
@@ -34,9 +35,19 @@ export class CharacterSpawnPoint implements ISpawnPoint
 		// console.log('path', path);
 		loadingManager.loadGLTF('assets/models/boxman_.glb', async (model) =>
 		{
-			const modelMan = await loadSomething('assets/models/base_main_rig.glb');
+			// const animations = model.animations.filter(animation => animation.name !== 'jump_running');
+			// model.animations = animations;
+
+			const modelMan = await loadGLFT('assets/models/base_main_rig.glb');
+			const newAnimations = await loadFBX('assets/models/jump_far.fbx');
+			console.log('model', model);
+			console.log('newAnimations', newAnimations);
 			// @ts-ignore
 			model.scene = modelMan.scene;
+			// @ts-ignore
+			// newAnimations.animations[0].name = 'jump_running';
+			// @ts-ignore
+			// model.animations.push(...newAnimations.animations);
 
 
 			let player = new Character(model, this.scenario);
@@ -56,19 +67,17 @@ export class CharacterSpawnPoint implements ISpawnPoint
 			if (this.scenario) player.takeControl();
 		});
 	}
-
-	walk(): void {
-		this.character.setState(new StartWalkLeft(this.character));
-		this.character.triggerAction('up', true);
-	}
 }
 
 
-async function loadSomething(filepath: string) {
+async function loadFBX(filepath: string) {
 	return new Promise((resolve) => {
-		const loader = new GLTFLoader();
+		new FBXLoader().load(filepath, model => resolve(model));
+	});
+}
 
-		// @ts-ignore
-		loader.load(filepath, model => resolve(model));
+async function loadGLFT(filepath: string) {
+	return new Promise((resolve) => {
+		new GLTFLoader().load(filepath, model => resolve(model));
 	});
 }

@@ -324,10 +324,10 @@ export class World
 				this.physicsWorld.addBody(hammer.bottom);
 				this.physicsWorld.addBody(hammer.body);
 				this.physicsWorld.addConstraint(hammer.hammer);
-				hammer.hammer.enableMotor();
+				// hammer.hammer.enableMotor();
 				//@ts-ignore
-				hammer.hammer.setMotorSpeed(+child.userData.clockwise ? 5 : -5);
-				hammer.hammer.collideConnected = false
+				// hammer.hammer.setMotorSpeed(+child.userData.clockwise ? 5 : -5);
+				// hammer.hammer.collideConnected = false
 				this.hammers.push(hammer)
 				Utils.setupMeshProperties(child);
 				this.sky.csm.setupMaterial(child.material);
@@ -377,7 +377,7 @@ export class World
 								Utils.setupMeshProperties(child);
 								this.sky.csm.setupMaterial(child.material);
 
-								this.physicsWorld.addBody(phys.body);
+								!mass && this.physicsWorld.addBody(phys.body);
 							}
 							else if (child.userData.type === 'trimesh')
 							{
